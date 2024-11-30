@@ -12,7 +12,7 @@ def mask_account_cart(info: str) -> str:
 
     if identifier.lower().startswith("счет"):
         masked_info = get_mask_account(number)
-        return f"{identifier} **{masked_info}"
+        return f"{identifier} {masked_info}"
     else:
         masked_info = get_mask_card_number(number)
         return f"{identifier} {masked_info}"
