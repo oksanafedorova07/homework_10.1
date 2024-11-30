@@ -24,6 +24,7 @@ def get_date(user_data: str) -> str:
 
     return f"{(user_data[8:10])}.{(data_day.split('-')[-2])}.{(data_day.split('-')[-3])}"
 
+
 user_input = input("Введите номер карты или номер счета: ")
 masked_output = mask_account_cart(user_input)
 print(masked_output)
