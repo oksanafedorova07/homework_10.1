@@ -18,15 +18,15 @@ def mask_account_cart(info: str) -> str:
         return f"{identifier} {masked_info}"
 
 
-def get_date(date_str: str) -> str:
-    """Функция, преобразует строку даты а нужный формат."""
-    date_part = date_str.split("Т")[0]  # Берем только дату
-    year, month, day = date_str.split("-")
-    return f"{day}.{month}.{year}"
+def get_date(user_data: str) -> str:
+    """Функция, которая изменяет формат даты"""
+    data_day = user_data.split("Т")[0]
 
+    return f"{(user_data[8:10])}.{(data_day.split('-')[-2])}.{(data_day.split('-')[-3])}"
 
 user_input = input("Введите номер карты или номер счета: ")
 masked_output = mask_account_cart(user_input)
 print(masked_output)
 
 print((get_date("2024-03-11T02:26:18.671487")))
+print(mask_account_cart("Visa Platinum 8990922113665229"))
