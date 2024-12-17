@@ -9,3 +9,8 @@
 python main.py - из корня репозитория проекта
 python <_path_>main.py - из другой папки  
 <_path_> - путь к файлу main.py проекта Home_work_module_2
+
+## Тестирование
+код протестирован pytest
+Чтобы установить pytest, используйте команды: poetry add --group dev pytest
+
