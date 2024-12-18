@@ -71,7 +71,7 @@ def filter_by_currency(all_transactions: list, currency: str) -> None:
                 continue
     usd_transactions = filter_by_currency(transactions, "USD")
     for _ in range(5):
-          print(next(usd_transactions))
+        print(next(usd_transactions))
 
 
 def transaction_descriptions(list_transactions):
