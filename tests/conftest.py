@@ -34,5 +34,5 @@ def trans_list() -> list:
         {"currency": {"name": "USD", "code": "USD"}},
         {"currency": {"name": "руб.", "code": "RUB"}},
         {"currency": {"name": "USD", "code": "USD"}},
-        {"currency": {"name": "руб.", "code": "RUB"}}
+        {"currency": {"name": "руб.", "code": "RUB"}},
     ]
