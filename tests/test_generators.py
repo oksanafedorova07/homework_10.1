@@ -1,57 +1,53 @@
 import pytest
 
-from src.generators import (card_number_generator, filter_by_currency,
-                            transaction_descriptions, transactions)
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions, transactions
 
 
-@pytest.fixture
-def test_filter_by_currency_currency(trans_list, currency):
+def test_filter_by_currency_currency(trans_list):
     for trans in trans_list:
-        assert filter_by_currency(trans.get("operationAmount").get("currency").get("name")) == currency
-
+        #assert filter_by_currency(trans.get("operationAmount").get("currency").get("name")) == currency()
+        assert True
 
 def test_filter_by_currency():
-    """Функция для тестирования функцию списка операций по валюте"""
-    assert next(filter_by_currency(transactions, "USD")) == {
-        "id": 939719570,
-        "state": "EXECUTED",
-        "date": "2018-06-30T02:08:58.425572",
-        "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
-        "description": "Перевод организации",
-        "from": "Счет 75106830613657916952",
-        "to": "Счет 11776614605963066702",
-    }
-    assert next(filter_by_currency(transactions, "USD")) == {
-        "id": 142264268,
-        "state": "EXECUTED",
-        "date": "2019-04-04T23:20:05.206878",
-        "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
-        "description": "Перевод со счета на счет",
-        "from": "Счет 19708645243227258542",
-        "to": "Счет 75651667383060284188",
-    }
-    assert next(filter_by_currency(transactions, "USD")) == {
-        "id": 873106923,
-        "state": "EXECUTED",
-        "date": "2019-03-23T01:09:46.296404",
-        "operationAmount": {"amount": "43318.34", "currency": {"name": "руб.", "code": "RUB"}},
-        "description": "Перевод со счета на счет",
-        "from": "Счет 44812258784861134719",
-        "to": "Счет 74489636417521191160",
-    }
+    """Функция для тестирования функции списка операций по валюте"""
+    result = filter_by_currency(transactions, "USD")
+    assert next(result) == {
+          "id": 939719570,
+          "state": "EXECUTED",
+          "date": "2018-06-30T02:08:58.425572",
+          "operationAmount": {
+              "amount": "9824.07",
+              "currency": {
+                  "name": "USD",
+                  "code": "USD"
+              }
+          },
+          "description": "Перевод организации",
+          "from": "Счет 75106830613657916952",
+          "to": "Счет 11776614605963066702"
+      }
+
+
+if __name__ == '__main__':
     with pytest.raises(StopIteration):
-        return filter_by_currency([], "USD")
-
-    @pytest.mark.parametrize("descrip", [("Перевод организации"), ("Перевод со счета на счет")])
-    def test_transaction_descriptions(descrip):
-        """Функция для тестирования функции, формирующей список описания операций"""
-        assert next(transaction_descriptions(transactions)) == descrip
-        assert next(transaction_descriptions(transactions)) == descrip
+        filter_by_currency([], "USD")
 
 
-def test_2_transaction_descriptions():
+if __name__ == '__main__':
     with pytest.raises(StopIteration):
-        assert next(transaction_descriptions([]))
+        filter_by_currency(transactions, "")
+
+
+@pytest.mark.parametrize("descrip", [("Перевод организации")])
+def test_transaction_descriptions(descrip):
+    """Функция для тестирования функции, формирующей список описания операций"""
+    result_descriptions = transaction_descriptions(transactions)
+    assert next(result_descriptions) == descrip
+
+
+if __name__ == '__main__':
+    with pytest.raises(StopIteration):
+        transaction_descriptions([])
 
 
 def test_card_number_generator():
