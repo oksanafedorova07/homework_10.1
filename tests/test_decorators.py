@@ -1,5 +1,6 @@
-import pytest
 from typing import Any
+
+import pytest
 
 from src.decorators import log, result_function
 
@@ -10,6 +11,7 @@ def test_log_func() -> Any:
     @log("")
     def result_function(x: int, y: int) -> Any:
         return x**y
+
     result = result_function(2, 3)
     assert result == 8
 
