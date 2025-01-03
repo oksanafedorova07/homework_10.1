@@ -1,14 +1,11 @@
-import json
+import json # noqa
 from unittest.mock import patch
-
 
 
 import os
 
-from unittest.mock import patch
 
 import pytest
-
 from src.utils import financial_transactions, transaction_amount
 
 
