@@ -20,7 +20,7 @@ def financial_transactions(path: str) -> list:
         return []
 
 
-def transaction_amount(trans: dict, currency: str = "RUB") -> Any:
+def transaction_amount(trans: Any, currency: str = "RUB") -> Any:
     """Функция принимает на вход транзакцию и возвращает сумму транзакции в рублях"""
     if trans["operationAmount"]["currency"]["code"] == currency:
         amount = trans["operationAmount"]["amount"]
