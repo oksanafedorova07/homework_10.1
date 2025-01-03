@@ -1,12 +1,7 @@
 import os
-
-from typing import Any, Dict
+from typing import Any
 
 import requests
-
-from requests import get
-
-
 from dotenv import load_dotenv
 
 load_dotenv()

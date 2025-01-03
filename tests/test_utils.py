@@ -1,13 +1,11 @@
 import json  # noqa
 import os
+from typing import Any
 from unittest.mock import patch
 
-
-from requests import get
 import pytest
 
 from src.utils import financial_transactions, transaction_amount
-from typing import Any
 
 
 @pytest.fixture
@@ -83,6 +81,6 @@ def test_transaction_amount(trans: None) -> None:
 
 
 @patch("src.utils.currency_conversion")
-def test_transaction_amount_non_rub(mock_currency_conversion: float, trans_1: dict) -> float:
+def test_transaction_amount_non_rub(mock_currency_conversion: None, trans_1: dict) -> None:
     mock_currency_conversion.return_value = 1000.0
     assert transaction_amount(trans_1) == 1000.0
