@@ -1,30 +1,35 @@
 import json
-from json import JSONDecodeError
+import logging
+import os
+from pathlib import Path
 from typing import Any
 
-from src.external_api import currency_conversion
+PATH_TO_PROJECT = Path(__file__).resolve().parent.parent
+PATH_TO_FILE = PATH_TO_PROJECT / "data" / "operations.json"
 
 
-def financial_transactions(path: str) -> list:
-    """Функция принимает на вход путь до JSON-файла и возвращает список словарей с данными о финансовых транзакциях."""
-    try:
-        with open(path, encoding="utf-8") as financial_file:
-            try:
-                transactions = json.load(financial_file)
-            except JSONDecodeError:
-                return []
-        if not isinstance(transactions, list):
+logger = logging.getLogger("utils")
+logger.setLevel(logging.DEBUG)
+fileHandler = logging.FileHandler(PATH_TO_PROJECT / "logs" / "utils.log", encoding="UTF-8", mode="w")
+fileFormatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s: %(message)s")
+fileHandler.setFormatter(fileFormatter)
+logger.addHandler(fileHandler)
+
+
+def get_transactions(file: str) -> Any:
+    """Функция, возвращающая данные из файла json"""
+    with open(file, encoding="UTF-8") as f:
+        try:
+            logger.info("Получаем данные json файла")
+            data = json.load(f)
+        except json.decoder.JSONDecodeError:
+            logger.error("Ошибка! Некорректные данные json файла")
             return []
-        return transactions
-    except FileNotFoundError:
-        return []
+        if len(data) == 0 or type(data) is not list:
+            logger.error("Ошибка! Либо файла пустой, либо файл не содержит список")
+            return []
+        return data
 
 
-def transaction_amount(trans: Any, currency: str = "RUB") -> Any:
-    """Функция принимает на вход транзакцию и возвращает сумму транзакции в рублях"""
-    if trans["operationAmount"]["currency"]["code"] == currency:
-        amount = trans["operationAmount"]["amount"]
-        return amount
-    else:
-        amount = currency_conversion(trans)
-    return amount
+if __name__ == "__main__":
+    print(get_transactions(os.path.abspath(PATH_TO_FILE)))
