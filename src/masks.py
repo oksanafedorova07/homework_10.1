@@ -1,54 +1,48 @@
-from typing import Union
 import logging
-import os
 
+from src.utils import PATH_TO_PROJECT
 
-
-# Получаем абсолютный путь до текущей директории
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Создаем путь до файла логов относительно текущей директории
-rel_file_path = os.path.join(current_dir, "../logs/masks.log")
-abs_file_path = os.path.abspath(rel_file_path)
-
-# Добавляем логгер, который записывает логи в файл.
 logger = logging.getLogger("masks")
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(abs_file_path, "w", encoding="utf-8")
-file_formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
-)
-file_handler.setFormatter(file_formatter)
-logger.addHandler(file_handler)
+fileHandler = logging.FileHandler(PATH_TO_PROJECT / "logs" / "masks.log", encoding="UTF-8", mode="w")
+fileFormatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s: %(message)s")
+fileHandler.setFormatter(fileFormatter)
+logger.addHandler(fileHandler)
 
 
-def get_mask_card_number(card_number: str) -> str:
-    """Функция маскировки номера карты"""
-
-    card_number_str = str(card_number)
-
-    if len(card_number_str) == 16:
-        logger.info("Формат карты верный")
-        return f"{card_number_str[:4]} {card_number_str[4:6]}** **** {card_number_str[-4:]}"
+def get_mask_card_number(card: str) -> str:
+    """Возвращает реквизиты карты с зашифрованным номером"""
+    counter = 0
+    for num in card:
+        if num.isdigit():
+            counter += 1
+    if counter == 16 and card[-16:].isdigit():
+        logger.info("Получаем реквизиты карты с зашифрованным номером")
+        slice_card = card[-10:-4]
+        mask_card = card.replace(slice_card, "******")
+        new_mask_card = mask_card[:-12] + " " + mask_card[-12:-8] + " " + mask_card[-8:-4] + " " + mask_card[-4:]
+        return new_mask_card
     else:
-        logger.warning("Неверный формат банковской карты")
-        return "Неверный формат банковской карты"
+        logger.error("Ошибка! некорректный ввод реквизитов карты")
+        return "Некорректный ввод"
 
 
-print(get_mask_card_number("7000792289606361"))
-
-
-def get_mask_account(accound_number: str) -> str:
-    """Функция маскировки номера счета"""
-
-    account_number_str = str(accound_number)
-
-    if len(account_number_str) == 20:
-        logger.info("Формат счета верный")
-        return f"**{account_number_str[-4:]}"
+def get_mask_account(acc: str) -> str:
+    """Возвращает реквизиты счета с зашифрованным номером"""
+    counter = 0
+    for num in acc:
+        if num.isdigit():
+            counter += 1
+    if counter == 20 and acc[-20:].isdigit():
+        logger.info("Получаем реквизиты счета с зашифрованным номером")
+        slice_acc = acc[-20:-4]
+        mask_acc = acc.replace(slice_acc, "**")
+        return mask_acc
     else:
-        logger.warning("Неверный формат счета")
-        return "Неверный формат номера счета"
+        logger.error("Ошибка! некорректный ввод реквизитов счета")
+        return "Некорректный ввод"
 
 
-print(get_mask_account("73654108430135874305"))
+if __name__ == "__main__":
+    print(get_mask_card_number("Discover 7269000803370165"))
+    # print(get_mask_account("1234567890096548321"))
