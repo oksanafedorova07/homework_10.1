@@ -2,10 +2,11 @@ import json
 from unittest.mock import patch
 
 from src.utils import get_transactions
+from typing import Any
 
 
 @patch("builtins.open")
-def test_read_file(mock_open):
+def test_read_file(mock_open: Any) -> Any:
     mock_file = mock_open.return_value.__enter__.return_value
     mock_file.read.return_value = json.dumps([{"test": "test"}])
     assert get_transactions("C:/Users/Nurlan/IT/Проекты/mask_card2/data/operations.json") == [{"test": "test"}]
