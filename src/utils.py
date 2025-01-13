@@ -1,46 +1,35 @@
 import json
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
-# Получаем абсолютный путь до текущей директории
-current_dir = os.path.dirname(os.path.abspath(__file__))
+PATH_TO_PROJECT = Path(__file__).resolve().parent.parent
+PATH_TO_FILE = PATH_TO_PROJECT / "data" / "operations.json"
 
-# Создаем путь до файла логов относительно текущей директории
-rel_log_file_path = os.path.join(current_dir, "../logs/utils.log")
-abs_log_file_path = os.path.abspath(rel_log_file_path)
 
-# Создаем путь до файла JSON относительно текущей директории
-rel_src_file_path = os.path.join(current_dir, "../data/operations.json")
-abs_src_file_path = os.path.abspath(rel_src_file_path)
-
-# Добавляем логгер, который записывает логи в файл.
 logger = logging.getLogger("utils")
-logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(abs_log_file_path, "w", encoding="utf-8")
-file_formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
-)
-file_handler.setFormatter(file_formatter)
-logger.addHandler(file_handler)
+logger.setLevel(logging.DEBUG)
+fileHandler = logging.FileHandler(PATH_TO_PROJECT / "logs" / "utils.log", encoding="UTF-8", mode="w")
+fileFormatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s: %(message)s")
+fileHandler.setFormatter(fileFormatter)
+logger.addHandler(fileHandler)
 
 
-def get_transactions_info_json(json_file: str) -> list[Any]:
-    """Функция принимает на вход путь до JSON-файла и возвращает список словарей"""
-
-    with open(json_file, "r", encoding="utf-8") as file:
+def get_transactions(file: str) -> Any:
+    """Функция, возвращающая данные из файла json"""
+    with open(file, encoding="UTF-8") as f:
         try:
-            logger.info("Путь до файла json верный")
-            transactions_info = json.load(file)
-            return transactions_info
-        except:
-            logger.warning("Импортируемый список пуст или отсутствует.")
+            logger.info("Получаем данные json файла")
+            data = json.load(f)
+        except json.decoder.JSONDecodeError:
+            logger.error("Ошибка! Некорректные данные json файла")
             return []
+        if len(data) == 0 or type(data) is not list:
+            logger.error("Ошибка! Либо файла пустой, либо файл не содержит список")
+            return []
+        return data
 
 
-print(
-    json.dumps(
-        get_transactions_info_json(abs_src_file_path),
-        indent=4,
-    )
-)
+if __name__ == "__main__":
+    print(get_transactions(os.path.abspath(PATH_TO_FILE)))
