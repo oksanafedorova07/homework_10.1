@@ -1,6 +1,6 @@
-2025-01-14 03:14:08,353-operations-INFO: Успешное чтение файла C:\education\ transactions.csv
-2025-01-14 03:14:08,357-operations-INFO: Успешное чтение файла C:\education\ transactions.csv
-2025-01-14 03:14:08,362-operations-ERROR: Ошибка чтения файла  
-2025-01-14 03:14:08,365-operations-INFO: Успешное чтение файла C:\education\ transactions_excel.xlsx
-2025-01-14 03:14:08,368-operations-INFO: Успешное чтение файла 
-2025-01-14 03:14:08,370-operations-ERROR: Ошибка чтения файла C:\education\ transactions_excel.xlsx 
+2025-01-14 03:31:49,088-operations-INFO: Успешное чтение файла C:/education/ transactions.csv
+2025-01-14 03:31:49,092-operations-INFO: Успешное чтение файла C:/education/transactions.csv
+2025-01-14 03:31:49,094-operations-ERROR: Ошибка чтения файла  
+2025-01-14 03:31:49,095-operations-INFO: Успешное чтение файла C:/education/transactions_excel.xlsx
+2025-01-14 03:31:49,098-operations-INFO: Успешное чтение файла 
+2025-01-14 03:31:49,100-operations-ERROR: Ошибка чтения файла C:/education/transactions_excel.xlsx 
