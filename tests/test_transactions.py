@@ -14,7 +14,7 @@ from src.transactions import read_from_csv, read_from_excel
 )
 def test_read_from_csv(mock_file: AnyStr) -> None:
     """Тест проверки считывания файла формата csv."""
-    mock_csv_file = read_from_csv("C:\education\ transactions.csv")
+    mock_csv_file = read_from_csv("C:/education/ transactions.csv")
     converted_to_dict = [
         {
             "id": "3176764",
@@ -30,7 +30,7 @@ def test_read_from_csv(mock_file: AnyStr) -> None:
 @patch("builtins.open", new_callable=mock_open, read_data="")
 def test_read_from_csv_empty(mock_file: AnyStr) -> None:
     """Тест проверки считывания пустого файла формата csv."""
-    mock_csv_file = read_from_csv("C:\education\ transactions.csv")
+    mock_csv_file = read_from_csv("C:/education/transactions.csv")
     assert mock_csv_file == []
 
 
@@ -54,7 +54,7 @@ def test_read_from_excel(mock_excel_file: Any) -> None:
         }
     ]
 
-    assert read_from_excel("C:\education\ transactions_excel.xlsx") == [
+    assert read_from_excel("C:/education/transactions_excel.xlsx") == [
         {
             "id": "3176764",
             "state": "CANCELED",
@@ -75,5 +75,5 @@ def test_read_from_excel_empty(mock_file: AnyStr) -> None:
 @patch("builtins.open", side_effect=FileNotFoundError)
 def test_read_from_excel_no_file(mock_file: list[dict]) -> None:
     """Тест на отсутствие файла формата excel."""
-    mock_no_file = read_from_csv("C:\education\ transactions_excel.xlsx")
+    mock_no_file = read_from_csv("C:/education/transactions_excel.xlsx")
     assert mock_no_file == []
