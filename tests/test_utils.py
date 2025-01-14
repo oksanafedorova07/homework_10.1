@@ -1,8 +1,8 @@
 import json
+from typing import Any
 from unittest.mock import patch
 
 from src.utils import get_transactions
-from typing import Any
 
 
 @patch("builtins.open")
