@@ -1,130 +1,136 @@
-from src.generators import filter_by_currency
-from src.processing import filter_by_state, sort_by_date
-from src.sorting import count_categories
-from src.transactions import read_from_csv, read_from_excel
-from src.utils import get_transactions
-from src.widget import get_date, mask_account_cart
+import json
+import re
+from collections import Counter
+
+import pandas as pd
 
 
-def file_selection() -> list | str:
-    """Возвращает данные из файла, выбранного типа"""
-    user_input = input()
-    if user_input == "1":
-        print("Для обработки выбран JSON-файл.")
-        return get_transactions("../data/operations.json")
-    elif user_input == "2":
-        print("Для обработки выбран CSV-файл")
-        return read_from_csv("C:/education/transactions.csv")
-    elif user_input == "3":
-        print("Для обработки выбран EXCEL-файл")
-        return read_from_excel("C:/education/transactions_excel.xlsx")
-    else:
-        return "Введён некорректный номер"
+
+from src.transactions import  read_excel, again_read_csv # Фильтрация по ключевому слову
 
 
-def choice_state(data: list) -> list:
-    """Фильтрация данных по выбранному статусу"""
-    while True:
-        print(
-            "Введите статус, по которому необходимо выполнить фильтрацию."
-            "Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING"
-        )
-        user_input_2 = input()
-        if (
-            user_input_2.upper() == "EXECUTED"
-            or user_input_2.upper() == "CANCELED"
-            or user_input_2.upper() == "PENDING"
-        ):
-            print(f'Операции отфильтрованы по статусу "{user_input_2}"')
-            data = filter_by_state(data, user_input_2.upper())
-            break
+
+# Загрузка данных из JSON
+def load_transactions_from_json(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            transactions = json.load(file)
+        print("Данные из JSON-файла успешно загружены!")
+        return transactions
+    except Exception as e:
+        raise ValueError(f"Ошибка при загрузке данных из JSON: {e}")
+
+
+# Загрузка данных из CSV
+def load_transactions_from_csv(file_path):
+    try:
+        # Используем pandas для загрузки CSV с правильным разделителем
+        data = pd.read_csv(file_path, sep=";")
+        transactions = data.to_dict(orient="records")
+        print("Данные из CSV-файла успешно загружены!")
+        return transactions
+    except Exception as e:
+        raise ValueError(f"Ошибка при загрузке данных из CSV: {e}")
+
+
+# Загрузка данных из Excel
+def load_transactions_from_xlsx(file_path):
+    try:
+        data = pd.read_excel(file_path)
+        transactions = data.to_dict(orient="records")
+        print("Данные из XLSX-файла успешно загружены!")
+        return transactions
+    except Exception as e:
+        raise ValueError(f"Ошибка при загрузке данных из XLSX: {e}")
+
+
+def count_transactions_by_categories(transactions, categories):
+    try:
+        if not transactions or not categories:
+            return {category: 0 for category in categories}  # Возвращаем 0 для всех категорий, если нет данных
+
+        result = Counter()
+        for category in categories:
+            for transact in transactions:
+                description = transact.get("description", "")
+                if re.search(rf"\b{category}\b", description, re.IGNORECASE):
+                    result[category] += 1
+        return dict(result)
+    except Exception as e:
+        raise ValueError(f"Ошибка при подсчете транзакций по категориям: {e}")
+
+
+# Основная функция
+def main():
+    try:
+        print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+        print("Выберите необходимый пункт меню:")
+        print("1. Получить информацию о транзакциях из JSON-файла")
+        print("2. Получить информацию о транзакциях из CSV-файла")
+        print("3. Получить информацию о транзакциях из XLSX-файла")
+
+        choice = input("Ваш выбор (1/2/3): ")
+
+        if choice == "1":
+            file_path = "../data/operations.json"  # Укажи правильный путь
+            transactions = load_transactions_from_json(file_path)
+        elif choice == "2":
+            file_path = "../data/transactions.csv"  # Укажи правильный путь
+            transactions = load_transactions_from_csv(file_path)
+        elif choice == "3":
+            file_path = "../data/transactions_excel.xlsx"  # Укажи правильный путь
+            transactions = load_transactions_from_xlsx(file_path)
         else:
-            print(f'Статус операции "{user_input_2}" недоступен')
-    return data
+            print("Вы ввели цифру вне диапазона выбора. Программа завершена.")
+            return
 
+        if not transactions:
+            print("Не удалось загрузить данные. Программа завершена.")
+            return
 
-def choice_sort_by_date(data: list) -> list:
-    """Сортировка по дате"""
-    choice_sort = input()
-    if choice_sort.lower() == "да":
-        print("Отсортировать по возрастанию или по убыванию?")
-        sort_up_or_lower = input()
-        if sort_up_or_lower.lower() == "по возрастанию":
-            is_reverse = False
-            data = sort_by_date(data, is_reverse)
+        # Запрос статуса с улучшенной обработкой некорректного ввода
+        valid_statuses = ["EXECUTED", "CANCELED", "PENDING"]
+        while True:
+            status = input(f"\nВведите статус для фильтрации ({', '.join(valid_statuses)}): ").strip().upper()
+            if status in valid_statuses:
+                break
+            print(
+                f"Некорректный статус: '{status}'. Пожалуйста, выберите один из доступных: {', '.join(valid_statuses)}."
+            )
+
+        # Фильтрация по статусу
+        filtered_transactions = [t for t in transactions if t.get("state") == status]
+        print(f"\nОперации отфильтрованы по статусу '{status}'.")
+
+        # Сортировка по дате
+        if input("\nОтсортировать операции по дате? (Да/Нет): ").strip().lower() == "да":
+            order = input("Отсортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").strip().lower()
+            reverse_order = order == "убыванию"
+            filtered_transactions = sorted(filtered_transactions, key=lambda t: t["date"], reverse=reverse_order)
+            print("\nОперации отсортированы по дате.")
+
+        # Фильтрация по ключевому слову
+        if input("\nОтфильтровать список транзакций по слову в описании? (Да/Нет): ").strip().lower() == "да":
+            keyword = input("Введите ключевое слово: ").strip()
+            filtered_transactions = filter_transactions_by_keyword(filtered_transactions, keyword)
+
+        # Подсчет категорий
+        categories = ["вклад", "карта", "услуг"]
+        category_count = count_transactions_by_categories(filtered_transactions, categories)
+        print("\nПодсчет категорий операций:")
+        for category, count in category_count.items():
+            print(f"{category}: {count} операций")
+
+        # Результат
+        if filtered_transactions:
+            print("\nРаспечатываю итоговый список транзакций...")
+            for transaction in filtered_transactions:
+                print(transaction)
         else:
-            is_reverse = True
-            data = sort_by_date(data, is_reverse)
-    return data
+            print("\nНе найдено ни одной транзакции, подходящей под ваш запрос.")
 
-
-def sort_by_rub(data: list) -> list:
-    """Фильтрация по валюте"""
-    rub_transaction = input()
-    if rub_transaction.lower() == "да":
-        data = filter_by_currency(data, "RUB")
-    return list(data)
-
-
-def filter_by_world(data: list, sort_by_word: str) -> list:
-    """Фильтрация по строке"""
-    if sort_by_word.lower() == "да":
-        print("Введите слово:")
-        string_to_search = input()
-        data = count_categories(data, string_to_search)
-    return data
-
-
-def ending_result(data: list) -> None:
-    """Вычисление и вывод результатов по полученному списку транзакций"""
-    if len(data) == 0:
-        print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
-    else:
-        print(f"Всего банковских операций в выборке: {len(data)}\n")
-
-        for transaction in data:
-            date = get_date(transaction.get("date"))
-
-            try:
-                mask_from = mask_account_cart(transaction["from"])
-                print(f"{date} {transaction["description"]} {mask_from} -> ", end="")
-            except KeyError:
-                print(f"{date} {transaction["description"]} ", end="")
-            except AttributeError:
-                print(f"{date} {transaction["description"]} ", end="")
-
-            mask_to = mask_account_cart(transaction["to"])
-            try:
-                amount = transaction["amount"]
-            except KeyError:
-                amount = transaction["operationAmount"]["amount"]
-            try:
-                currency = transaction["currency_name"]
-            except KeyError:
-                currency = transaction["operationAmount"]["currency"]["name"]
-            print(f"{mask_to} Сумма: {amount} {currency}")
-
-
-def main() -> None:
-    """Возвращает список транзакций по выбранным условиям"""
-    print(
-        """Привет! Добро пожаловать в программу работы с банковскими транзакциями.
-    Выберите необходимый пункт меню:
-    1. Получить информацию о транзакциях из JSON-файла
-    2. Получить информацию о транзакциях из CSV-файла
-    3. Получить информацию о транзакциях из XLSX-файла"""
-    )
-    data = file_selection()
-    data = choice_state(data)
-    print("Отсортировать операции по дате? Да/Нет")
-    data = choice_sort_by_date(data)
-    print("Выводить только рублевые транзакции? Да/Нет")
-    data = sort_by_rub(data)
-    print("Отфильтровать список транзакций по определенному слову в описании? Да/Нет")
-    sort_by_word = input()
-    data = filter_by_world(data, sort_by_word)
-    print("Распечатываю итоговый список транзакций...")
-    ending_result(data)
+    except Exception as e:
+        print(f"Ошибка: {e}")
 
 
 if __name__ == "__main__":
