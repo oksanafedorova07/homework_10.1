@@ -11,6 +11,7 @@ from src.main import (
     load_transactions_from_xlsx,
 )
 
+from src.sortis import filter_transactions_by_keyword
 
 @pytest.fixture
 def data_dir():
@@ -36,6 +37,18 @@ def test_load_transactions_from_xlsx(data_dir):
     transactions = load_transactions_from_xlsx(file_path)
     assert isinstance(transactions, list), "Данные должны быть в виде списка"
 
+
+# Тестирование функции фильтрации по ключевому слову
+def test_filter_transactions_by_keyword():
+    transactions = [
+        {"description": "Открытие вклада", "amount": 5000, "status": "EXECUTED", "date": "2023-12-01"},
+        {"description": "Перевод с карты на карту", "amount": 1000, "status": "CANCELED", "date": "2023-11-15"},
+        {"description": "Оплата услуг", "amount": 2000, "status": "PENDING", "date": "2023-12-05"},
+        {"description": "Покупка билетов", "amount": 1500, "status": "CANCELED", "date": "2023-10-20"},
+    ]
+    keyword = "карта"
+    result = filter_transactions_by_keyword(transactions, keyword)
+    assert len(result) == 0, f"Должно быть 1 совпадение, а найдено {len(result)}"
 
 
 # Тестирование функции подсчета категорий
@@ -84,6 +97,15 @@ def test_count_transactions_by_categories_empty():
     assert result == {"вклад": 0, "карта": 0, "услуг": 0}, "Категории должны быть с нулевым количеством транзакций"
 
 
+# Тестирование фильтрации по ключевому слову, если слово не найдено
+def test_filter_transactions_by_keyword_no_match():
+    transactions = [
+        {"description": "Открытие вклада", "amount": 5000, "status": "EXECUTED", "date": "2023-12-01"},
+        {"description": "Перевод с карты на карту", "amount": 1000, "status": "CANCELED", "date": "2023-11-15"},
+    ]
+    keyword = "покупка"
+    result = filter_transactions_by_keyword(transactions, keyword)
+    assert len(result) == 0, f"Не должно быть совпадений для ключевого слова '{keyword}'"
 
 
 # Тестирование загрузки пустого JSON-файла
@@ -108,7 +130,9 @@ if __name__ == "__main__":
     test_load_transactions_from_json()
     test_load_transactions_from_csv()
     test_load_transactions_from_xlsx()
+    test_filter_transactions_by_keyword()
     test_count_transactions_by_categories()
+    test_filter_transactions_by_keyword_no_match()
     test_count_transactions_by_categories_empty()
     test_load_transactions_from_json_invalid_path()
     test_load_transactions_from_xlsx_invalid_path()

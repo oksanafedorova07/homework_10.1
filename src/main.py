@@ -6,7 +6,7 @@ import pandas as pd
 
 
 
-from src.transactions import  read_excel, again_read_csv # Фильтрация по ключевому слову
+from src.transactions import read_excel, again_read_csv  # Фильтрация по ключевому слову
 
 
 
