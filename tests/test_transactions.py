@@ -1,8 +1,9 @@
 from unittest.mock import mock_open, patch
 
 import pandas as pd
+from typing_extensions import AnyStr
 
-from src.transactions import read_csv, read_excel, again_read_csv
+from src.transactions import read_csv, read_excel
 
 
 @patch(
@@ -10,7 +11,7 @@ from src.transactions import read_csv, read_excel, again_read_csv
     new_callable=mock_open,
     read_data="Date,Description,Amount\n2025-01-01,Salary,3000\n2025-01-05,Groceries,-150\n",
 )
-def test_read_csv(mock_file):
+def test_read_csv(mock_file: Any) -> None:
     """Тест для функции read_csv с использованием mock"""
     expected_result = [
         {"Date": "2025-01-01", "Description": "Salary", "Amount": "3000"},
@@ -24,7 +25,7 @@ test_read_csv()
 
 
 @patch("pandas.read_excel")
-def test_read_excel(mock_read_excel):
+def test_read_excel(mock_read_excel) -> None:
     """Тест для функции read_excel с использованием mock"""
     mock_read_excel.return_value = pd.DataFrame(
         {"Date": ["2025-01-01", "2025-01-05"], "Description": ["Salary", "Groceries"], "Amount": [3000, -150]}

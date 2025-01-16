@@ -1,5 +1,8 @@
 import re
 
+from typing import Any
+
+
 
 def filter_transactions_by_keyword(transactions, keyword):
     result = []
@@ -22,7 +25,6 @@ def count_transactions_by_categories(transactions, categories):
             # Используем \b для корректного поиска категории
             if re.search(rf"\b{category}[а-я]*\b", description, re.IGNORECASE):
                 result[category] += 1
-
     return result
 
 

@@ -3,15 +3,14 @@ import re
 from collections import Counter
 
 import pandas as pd
+from typing import Any
 
-
-
-from src.transactions import read_excel, again_read_csv  # Фильтрация по ключевому слову
-
+from src.sortis import \
+    filter_transactions_by_keyword  # Фильтрация по ключевому слову
 
 
 # Загрузка данных из JSON
-def load_transactions_from_json(file_path):
+def load_transactions_from_json(file_path: Any):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             transactions = json.load(file)
@@ -22,7 +21,7 @@ def load_transactions_from_json(file_path):
 
 
 # Загрузка данных из CSV
-def load_transactions_from_csv(file_path):
+def load_transactions_from_csv(file_path: Any) -> None:
     try:
         # Используем pandas для загрузки CSV с правильным разделителем
         data = pd.read_csv(file_path, sep=";")
@@ -34,7 +33,7 @@ def load_transactions_from_csv(file_path):
 
 
 # Загрузка данных из Excel
-def load_transactions_from_xlsx(file_path):
+def load_transactions_from_xlsx(file_path: Any) -> None:
     try:
         data = pd.read_excel(file_path)
         transactions = data.to_dict(orient="records")
@@ -44,7 +43,7 @@ def load_transactions_from_xlsx(file_path):
         raise ValueError(f"Ошибка при загрузке данных из XLSX: {e}")
 
 
-def count_transactions_by_categories(transactions, categories):
+def count_transactions_by_categories(transactions, categories) -> None:
     try:
         if not transactions or not categories:
             return {category: 0 for category in categories}  # Возвращаем 0 для всех категорий, если нет данных

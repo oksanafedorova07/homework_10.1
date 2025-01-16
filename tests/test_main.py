@@ -4,17 +4,14 @@ import os
 import pandas as pd
 import pytest
 
-from src.main import (
-    count_transactions_by_categories,
-    load_transactions_from_csv,
-    load_transactions_from_json,
-    load_transactions_from_xlsx,
-)
-
+from src.main import (count_transactions_by_categories,
+                      load_transactions_from_csv, load_transactions_from_json,
+                      load_transactions_from_xlsx)
 from src.sortis import filter_transactions_by_keyword
 
+
 @pytest.fixture
-def data_dir():
+def data_dir() -> str:
     return os.path.join(os.path.dirname(__file__), "..", "data")
 
 
