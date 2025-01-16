@@ -11,7 +11,7 @@ from src.transactions import read_csv, read_excel
     new_callable=mock_open,
     read_data="Date,Description,Amount\n2025-01-01,Salary,3000\n2025-01-05,Groceries,-150\n",
 )
-def test_read_csv(mock_file: Any) -> None:
+def test_read_csv(mock_file):
     """Тест для функции read_csv с использованием mock"""
     expected_result = [
         {"Date": "2025-01-01", "Description": "Salary", "Amount": "3000"},
@@ -25,7 +25,7 @@ test_read_csv()
 
 
 @patch("pandas.read_excel")
-def test_read_excel(mock_read_excel) -> None:
+def test_read_excel(mock_read_excel):
     """Тест для функции read_excel с использованием mock"""
     mock_read_excel.return_value = pd.DataFrame(
         {"Date": ["2025-01-01", "2025-01-05"], "Description": ["Salary", "Groceries"], "Amount": [3000, -150]}
