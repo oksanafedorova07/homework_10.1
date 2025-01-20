@@ -1,40 +1,33 @@
 import csv
-import logging
-import os
 
 import pandas as pd
 from typing import Any
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-logs_path = os.path.join(dir_path, "..", "logs", "operations.log")
+def read_csv(file: Any) -> list[dict]:
+    """Функция для считывания файла в формате csv с помощью открытия файла и использование метода DictReader"""
+    with open(file, "r", encoding="utf=8") as f:
+        reader = csv.DictReader(f)
+        transactions = [row for row in reader]
 
-operations_logger = logging.getLogger("operations")
-file_handler = logging.FileHandler(logs_path, "w", encoding="UTF-8")
-file_formatter = logging.Formatter("%(asctime)s-%(name)s-%(levelname)s: %(message)s")
-file_handler.setFormatter(file_formatter)
-operations_logger.addHandler(file_handler)
-operations_logger.setLevel(logging.DEBUG)
+    return transactions
 
 
-def read_from_csv(file_path: str) -> list[dict]:
-    """Функция принимает пусть к файлу .csv и возвращает список словарей."""
-    try:
-        with open(file_path, encoding="utf-8") as file_name:
-            reader = csv.DictReader(file_name, delimiter=";")
-            operations_logger.info(f"Успешное чтение файла {file_path}")
-            return list(reader)
-    except FileNotFoundError as e:
-        operations_logger.error(f"Ошибка чтения файла {file_path} {e}")
-        return []
+def again_read_csv(file: Any):
+    """Функция для считывания файла с помощью библеотеки Pandas"""
+    return pd.read_csv(file)
 
 
-def read_from_excel(file_path: Any) -> list[dict]:
-    """Функция принимает пусть к файлу формата excel и возвращает список словарей."""
-    try:
-        excel_data = pd.read_excel(file_path).to_dict(orient="records")
-        operations_logger.info(f"Успешное чтение файла {file_path}")
-        return excel_data
-    except FileNotFoundError:
-        operations_logger.error(f"Ошибка чтения файла {file_path}")
-        return []
+if __name__ in "__main__":
+    print(read_csv("../data/transactions.csv"))
+    print(again_read_csv("../data/transactions.csv"))
+
+
+def read_excel(file: Any):
+    """Функция для считывание файла в формате excel с помощью библиотеки pandas"""
+    r1 = pd.read_excel(file)
+    return dict(r1)
+
+
+if __name__ in "__main__":
+    print(read_excel("../data/transactions_excel.xlsx"))
